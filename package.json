@@ -1,0 +1,23 @@
+{
+  "name": "washraccoon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "DevStart": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.2.3",
+    "css": "^3.0.0",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "mysql2": "^3.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
