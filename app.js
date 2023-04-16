@@ -24,6 +24,11 @@ const db = mysql.createConnection({
 const publicDirectory = path.join(__dirname,'./public' );
 app.use(express.static(publicDirectory));
 
+// parse URL-encoded bodies (as sent by html forms)
+app.use(express.urlencoded({ extended: false}));
+
+// Parse JSON bodies (as sent by API clints)
+app.use(express.json());
 
 // Set the view engine to EJS
 app.set("view engine", "ejs");
@@ -40,7 +45,8 @@ db.connect((err) => {
 
 
 // Define  routes
-app.use('/',require('./routes/pages.js'));
+app.use('/',require('./routes/pages'));
+app.use('/auth' ,require('./routes/auth'));
 // Start the server
 app.listen(4000, () => {
   console.log("Server listening on port 4000");
