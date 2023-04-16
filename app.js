@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: false}));
 app.use(express.json());
 
 // Set the view engine to EJS
-app.set("view engine", "ejs");
+app.set("view engine", "hbs");
 
 // Checking if mysql is connected or not
 db.connect((err) => {
