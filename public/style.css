@@ -1,5 +1,5 @@
 nav {
-    background-color: #ea602e;
+    background-color: #7cafe2;
     color: #fff;
     padding: 30px 60px;
     display: flex;
@@ -29,7 +29,7 @@ nav li a {
 
 
 nav li a:hover {
-    color: #334677;
+    color: #bae4fa;
     text-decoration: none;
 
 }

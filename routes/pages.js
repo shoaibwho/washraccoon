@@ -24,4 +24,14 @@ router.get('/profile',(req,res) => {
 
 });
 
+router.get('/editprofile',(req,res) => {
+    res.render("editprofile");
+
+});
+
+router.get('/changepassword',(req,res) => {
+    res.render("changepassword");
+
+});
+
 module.exports = router;
