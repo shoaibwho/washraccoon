@@ -17,16 +17,34 @@ exports.login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).render('login', {
         message:'Please provide an email and password'
-      });
+      })
     }
 
     db.query("SELECT * from users WHERE email =?", [email], async (error, results) => {
+      console.log(results);
       if (!results || !(await bcrypt.compare(password,results[0].password))) {
          res.status(401).render("login",{
             message:"Email or Password is incorrect"
-         });
+         })
+        }else {
+          const id = results[0].id;
+          const token = jwt.sign({ id: id}, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRES_IN
+        });
+
+          console.log("The token is: "+ token);
+
+          const cookieOptions = {
+            expires: new Date(
+              Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 *60 *1000
+            ),
+            httpOnly: true
+          }
+
+          res.cookie("jwt",token, cookieOptions);
+          res.status(200).redirect("/");
       }
-    });
+    })
   } catch (error) {
     console.log(error);
   }
@@ -58,15 +76,12 @@ exports.register = (req, res) => {
       if (results.length > 0) {
         return res.render('register',{
           message: 'That email is already in use'
-        });
+        })
       } else if (password !== passwordconfirm) {
         return res.render('register',{
           message: 'Passwords do not match'
         });
       }
-
-      let hashedPassword = await bcrypt.hash(password, 4);
-      console.log(hashedPassword);
 
       db.query('INSERT INTO users SET ?', { 
         userid: newUserId, 
@@ -75,9 +90,9 @@ exports.register = (req, res) => {
         phonenumber: phonenumber,
         email: email,
         address: address,
-        password: hashedPassword,
+        password: password,
         usertype: usertype
-      }, (error,results) => {
+      }, (error, results) => {
         if (error) {
           console.log(error);
         } else {
@@ -85,8 +100,74 @@ exports.register = (req, res) => {
           return res.render('register',{
             message: 'User registered' 
           });
-        }
-      });
-    });
+  
+       }
+    })
   });
-};
+});
+  
+
+
+exports.isLoggedIn = async (req, res, next) => {
+  // console.log(req.cookies);
+  if( req.cookies.jwt) {
+    try {
+      //1) verify the token
+      const decoded = await promisify(jwt.verify)(req.cookies.jwt,
+      process.env.JWT_SECRET
+      );
+
+      console.log(decoded);
+
+      //2) Check if the user still exists
+      db.query('SELECT * FROM users WHERE id = ?', [decoded.id], (error, result) => {
+        console.log(result);
+
+        if(!result) {
+          return next();
+        }
+
+        req.user = result[0];
+        console.log("user is")
+        console.log(req.user);
+        return next();
+
+      });
+    } catch (error) {
+      console.log(error);
+      return next();
+    }
+  } else {
+    next();
+  }
+}
+
+exports.logout = async (req, res) => {
+  res.cookie('jwt', 'logout', {
+    expires: new Date(Date.now() + 2*1000),
+    httpOnly: true
+  });
+
+  res.status(200).redirect('/');
+}
+
+// rest of the code above
+if (error) {
+  return res.status(400).json({
+    message: 'User not found'
+  });
+}
+// if user is found but password is wrong
+if (!user.validPassword(password)) {
+  return res.status(400).json({
+    message: 'Incorrect password'
+  });
+}
+// all good, return token
+return res.json({
+  token: jwt.sign({
+    email: user.email,
+    _id: user._id
+  }, 'SECRET')
+});
+}

@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const mysql = require('mysql2');
+const cookieParser = require('cookie-parser');
 
 // using dotenv to secure mysql user and password
 const dotenv = require("dotenv");
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: false}));
 
 // Parse JSON bodies (as sent by API clints)
 app.use(express.json());
+app.use(cookieParser());
 
 // Set the view engine to EJS
 app.set("view engine", "hbs");
