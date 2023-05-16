@@ -1,5 +1,5 @@
 const express = require("express");
-
+const authController = require('../controllers/auth')
 const router = express.Router();
 
 router.get('/',(req,res) => {
@@ -19,9 +19,16 @@ router.get('/login',(req,res) => {
 
 });
 
-router.get('/profile',(req,res) => {
-    res.render("profile");
+router.get('/profile',authController.isLoggedIn,(req,res) => {
 
+    if(req.user) {
+      res.render('profile',{
+        user: req.user
+      });
+
+    } else {
+        res.redirect('/login');
+    }
 });
 
 router.get('/editprofile',(req,res) => {

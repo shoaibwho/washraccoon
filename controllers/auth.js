@@ -2,6 +2,8 @@ const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); 
 const { query } = require('express');
+const { promisify } = require('util');
+const { error } = require('console');
 
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
@@ -170,4 +172,37 @@ return res.json({
     _id: user._id
   }, 'SECRET')
 });
+}
+
+
+
+exports.isLoggedIn = async (req,res,next) => {
+ console.log(req.cookies);
+ if(req.cookies.jwt) {
+  try {
+    // verify the token
+    const decoded = await promisify(jwt.verify)(req.cookies.jwt,process.env.JWT_SECRET);
+    console.log(decoded);
+    // cheack if user still exists
+     db.query('SELECT * FROM users WHERE id = ?', [decoded.id],(error,result)  => {
+      console.log(result);
+
+       if(!result) {
+         return next();
+
+       }
+
+        req.user = result[0];
+        return next();
+     });
+
+  } catch (error) {
+    console.log(error);
+    return next();
+    
+  }
+ } else {
+  next();
+ }
+ next();
 }
