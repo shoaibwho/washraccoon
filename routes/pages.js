@@ -41,4 +41,15 @@ router.get('/changepassword',(req,res) => {
 
 });
 
+
+router.get('/orderhistory',(req,res) => {
+    res.render("orderhistory");
+
+});
+
+router.get('/removeaccount',(req,res) => {
+    res.render("removeaccount");
+
+});
+
 module.exports = router;
